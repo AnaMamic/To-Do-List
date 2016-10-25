@@ -9,32 +9,47 @@
 import UIKit
 import CoreData
 
-class TaskViewController: UIViewController, UITextViewDelegate, UITextFieldDelegate {
+class TaskViewController: UIViewController {
 
     // MARK: Properties
     
-    @IBOutlet weak private var nameTextField: UITextField!
+    @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak private var descriptionTextView: UITextView!
     
     var task: Task?
-    var coreDataManager: CoreDataManager?
-    
+    var coreDataManager: CoreDataManager
+    var mode: Mode
     enum Mode {
         case add
         case edit
     }
     
-    var mode: Mode?
+    // MARK: Initialization
     
+    init(coreDataManager: CoreDataManager, task: Task?, mode: Mode) {
+        self.coreDataManager = coreDataManager
+        self.mode = mode
+        self.task = task
+        super.init(nibName: String(describing: TaskViewController.self), bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        viewSetup()
+        dataFetch()
+    }
+    
+    func viewSetup() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(save))
-
-        // Do any additional setup after loading the view.
-        
+    }
+    
+    func dataFetch() {
         if let task = task {
             nameTextField.text = task.name
             descriptionTextView.text = task.descriptionOfTask
@@ -42,42 +57,14 @@ class TaskViewController: UIViewController, UITextViewDelegate, UITextFieldDeleg
 
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    
-    // MARK: UITextFieldDelegate
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        nameTextField.resignFirstResponder()
-        return true
-    }
-    
-    // Hide keyboard when user tap outside
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
-    }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     func save() {
-        
+
         if (nameTextField.text?.isEmpty)! {
             let alert = UIAlertController(title: "", message: "Name must be filled out", preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
         } else {
-            switch mode! {
+            switch mode {
             case .add:
                 createTask()
             case .edit:
@@ -88,22 +75,36 @@ class TaskViewController: UIViewController, UITextViewDelegate, UITextFieldDeleg
         navigationController?.popViewController(animated: true)
     }
     
-    
     func createTask() {
-        if let taskRecord = coreDataManager?.createRecordForTask(){
+        if let taskRecord = coreDataManager.createRecordForTask(){
             task = taskRecord
             task?.name = nameTextField.text!
             task?.descriptionOfTask = descriptionTextView.text
             task?.createdAt = NSDate().timeIntervalSinceReferenceDate
-            coreDataManager?.saveContext()
+            coreDataManager.saveContext()
         }
     }
     
     func editTask() {
         task?.name = nameTextField.text
         task?.descriptionOfTask = descriptionTextView.text
+        coreDataManager.saveContext()
+    }
+}
+
+extension TaskViewController:  UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        nameTextField.resignFirstResponder()
+        return true
+    }
+    
+    // Hide keyboard when user tap outside
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
 
-    
 }
+
+
+
 

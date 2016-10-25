@@ -9,27 +9,44 @@
 import UIKit
 import CoreData
 
-class TaskListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate {
+class TaskListViewController: UIViewController {
 
     // MARK: Properties
 
-    @IBOutlet weak private var taskTableView: UITableView!
+    @IBOutlet weak var taskTableView: UITableView!
     
-    var coreDataManager: CoreDataManager?
-    var fetchedResultsController: NSFetchedResultsController<Task>?
+    var coreDataManager: CoreDataManager
+    let fetchedResultsController: NSFetchedResultsController<Task>?
+    
+    
+    // MARK: Initialization
+    
+    init(coreDataManager: CoreDataManager) {
+        self.coreDataManager = coreDataManager
+        fetchedResultsController = self.coreDataManager.fetchedResultsController()
+        super.init(nibName: String(describing: TaskListViewController.self), bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        viewSetup()
+        dataFetch()
+        
+    }
+    
+    private func viewSetup() {
         title = "Tasks"
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Delete all", style: .plain, target: self, action: #selector(deleteAll))
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "+", style: .plain, target: self, action: #selector(addNewTaskAction))
-        
         taskTableView.register(UITableViewCell.self, forCellReuseIdentifier: "TaskCell")
-        
-        fetchedResultsController = coreDataManager?.fetchedResultsController()
+    }
+    
+    private func dataFetch() {
         fetchedResultsController?.delegate = self
         
         do {
@@ -39,73 +56,82 @@ class TaskListViewController: UIViewController, UITableViewDataSource, UITableVi
             print("Unable to Save Task")
             print("\(fetchError), \(fetchError.localizedDescription)")
         }
-
     }
+    
+    
+
+    // MARK: - Actions
+     
+     func addNewTaskAction() {
+        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: nil, mode: .add)
+        navigationController?.pushViewController(taskViewController, animated: true)
+     }
+
+    func deleteAll() {
+        coreDataManager.deleteAllTasks()
+        coreDataManager.saveContext()
+    }
+
+}
+
+extension TaskListViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let sections = fetchedResultsController?.sections {
-            let sectionInfo = sections[section]
-            return sectionInfo.numberOfObjects
+        
+        guard let sections = fetchedResultsController?.sections else {
+            return 0
         }
         
-        return 0
+        let sectionInfo = sections[section]
+        return sectionInfo.numberOfObjects
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
-        
-        /*
-        cell.textLabel?.text = myTasks[indexPath.row].name
-        return cell */
         
         if let task = fetchedResultsController?.object(at: indexPath) as Task? {
             cell.textLabel?.text = task.name
         }
         
         return cell
-        
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
         return true
     }
     
-    
-    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            if let task = fetchedResultsController?.object(at: indexPath) as Task? {
-                fetchedResultsController?.managedObjectContext.delete(task)
-                coreDataManager?.saveContext()
-            }
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+        
+        if editingStyle != .delete {
+            return
         }
-    }
-    
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = fetchedResultsController?.object(at: indexPath)
-        let taskViewController = TaskViewController(nibName: String(describing: TaskViewController.self), bundle: nil)
-        taskViewController.coreDataManager = coreDataManager
-        taskViewController.mode = .edit
-        taskViewController.task = task
-        navigationController?.pushViewController(taskViewController, animated: true)
+        
+        guard let task = fetchedResultsController?.object(at: indexPath) as Task? else {
+            return
+        }
+        
+        fetchedResultsController?.managedObjectContext.delete(task)
+        coreDataManager.saveContext()
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
         return false
     }
+}
 
-    // MARK: NSFetchedResultsControllerDelegate
+extension TaskListViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let task = fetchedResultsController?.object(at: indexPath) as Task?
+        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: task, mode: .edit)
+        navigationController?.pushViewController(taskViewController, animated: true)
+    }
+}
+
+extension TaskListViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         taskTableView.beginUpdates()
@@ -119,45 +145,26 @@ class TaskListViewController: UIViewController, UITableViewDataSource, UITableVi
         
         switch(type) {
         case .insert:
-            if newIndexPath != nil {
-                taskTableView.insertRows(at: [newIndexPath!], with: .fade)
-            }
+            guard let newIndexPath = newIndexPath else { return }
+            taskTableView.insertRows(at: [newIndexPath], with: .fade)
             break
         case .delete:
-            if indexPath != nil {
-                taskTableView.deleteRows(at: [indexPath!], with: .fade)
-            }
+            guard let indexPath = indexPath else { return }
+            
+            taskTableView.deleteRows(at: [indexPath], with: .fade)
             break
         case .update:
-            if indexPath != nil {
-                taskTableView.reloadRows(at: [indexPath!], with: .fade)
-            }
+            guard let indexPath = indexPath else { return }
+
+            taskTableView.reloadRows(at: [indexPath], with: .fade)
             break
         case .move:
-            if indexPath != nil {
-                taskTableView.deleteRows(at: [indexPath!], with: .fade)
-            }
+            guard let indexPath = indexPath else { return  }
+            guard let newIndexPath = newIndexPath else { return }
             
-            if newIndexPath != nil {
-                taskTableView.insertRows(at: [newIndexPath!], with: .fade)
-            }
+            taskTableView.deleteRows(at: [indexPath], with: .fade)
+            taskTableView.insertRows(at: [newIndexPath], with: .fade)
             break
-            
         }
-    }
-
-    // MARK: - Navigation
-     
-     func addNewTaskAction() {
-     let taskViewController = TaskViewController(nibName: String(describing: TaskViewController.self), bundle: nil)
-     taskViewController.coreDataManager = coreDataManager
-     taskViewController.mode = .add
-     navigationController?.pushViewController(taskViewController, animated: true)
-     }
-    
-    
-    func deleteAll() {
-        coreDataManager?.deleteAll()
-        coreDataManager?.saveContext()
     }
 }

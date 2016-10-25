@@ -16,25 +16,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var coreDataManager = CoreDataManager()
     
    
-    
-    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         
-        let taskListViewController = TaskListViewController(nibName: String(describing: TaskListViewController.self), bundle: nil)
-        
-        taskListViewController.coreDataManager = coreDataManager
-        
+        let taskListViewController = TaskListViewController(coreDataManager: coreDataManager)
         let navigationController = UINavigationController(rootViewController: taskListViewController)
-       /* let nekiViewController = NekiViewController(nibName: String(describing: NekiViewController.self), bundle: nil) */
-       /* let navigationController = UINavigationController(rootViewController: nekiViewController) */
-        
+       
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         return true
     }
-    
-    
     
 }

@@ -8,72 +8,38 @@
 
 import Foundation
 import CoreData
+typealias TaskFetchedResultsController = NSFetchedResultsController<Task>
 
 extension CoreDataManager {
     
-    
     func createRecordForTask() -> Task? {
-        var result: Task? = nil
+        var task: Task?
+
+        let entity = NSEntityDescription.entity(forEntityName: "Task", in: persistentContainer.viewContext)
         
-        // Create Entity Description
-        let entityDescription = NSEntityDescription.entity(forEntityName: "Task", in: persistentContainer.viewContext)
-        
-        if let entityDescription = entityDescription {
-            // Create Managed Object
-            result = NSManagedObject(entity: entityDescription, insertInto: persistentContainer.viewContext) as? Task
+        if let entity = entity {
+            task = NSManagedObject(entity: entity, insertInto: persistentContainer.viewContext) as? Task
         }
         
-        return result
+        return task
     }
     
-    
-    
-    func fetchRecordsForTask() -> [Task] {
-        // Create Fetch Request
-        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Task")
-        
-        // Helpers
-        var result = [Task]()
+    func deleteAllTasks() {
         
         do {
-            // Execute Fetch Request
-            let records = try persistentContainer.viewContext.fetch(fetchRequest)
-            
-            if let records = records as? [Task] {
-                result = records
-            }
-            
-        } catch {
-            print("Unable to fetch managed objects for entity Task.")
-        }
-        
-        return result
-    }
-    
-    
-    func deleteAll() {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Task")
-        let deleteRequest: NSBatchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        
-        do {
-            try persistentContainer.viewContext.execute(deleteRequest)
+            try persistentContainer.viewContext.execute(NSBatchDeleteRequest(fetchRequest: NSFetchRequest(entityName: "Task")))
         } catch {
             print("Unable to delete all objects for entity Task")
         }
         
-        
     }
     
-    func fetchedResultsController() -> NSFetchedResultsController<Task>? {
-        let fetchRequest:NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Task")
+    func fetchedResultsController() -> TaskFetchedResultsController? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
         let sortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor] 
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        return fetchedResultsController as? NSFetchedResultsController<Task>
+        return fetchedResultsController as? TaskFetchedResultsController
     }
-    
-    
-    
-    
 }
 
