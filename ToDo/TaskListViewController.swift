@@ -15,7 +15,7 @@ class TaskListViewController: UIViewController {
 
     @IBOutlet weak var taskTableView: UITableView!
     
-    var coreDataManager: CoreDataManager
+    let coreDataManager: CoreDataManager
     let fetchedResultsController: NSFetchedResultsController<Task>?
     
     

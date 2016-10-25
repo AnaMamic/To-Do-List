@@ -17,8 +17,8 @@ class TaskViewController: UIViewController {
     @IBOutlet weak private var descriptionTextView: UITextView!
     
     var task: Task?
-    var coreDataManager: CoreDataManager
-    var mode: Mode
+    let coreDataManager: CoreDataManager
+    let mode: Mode
     enum Mode {
         case add
         case edit
@@ -45,11 +45,11 @@ class TaskViewController: UIViewController {
         dataFetch()
     }
     
-    func viewSetup() {
+    private func viewSetup() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(save))
     }
     
-    func dataFetch() {
+    private func dataFetch() {
         if let task = task {
             nameTextField.text = task.name
             descriptionTextView.text = task.descriptionOfTask
