@@ -15,15 +15,14 @@ class TaskListViewController: UIViewController {
 
     @IBOutlet weak var taskTableView: UITableView!
     
-    let coreDataManager: CoreDataManager
-    let fetchedResultsController: NSFetchedResultsController<Task>?
-    
-    
+    let viewModel: TaskListViewModel
+    let navigationService: NavigationService
+
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager) {
-        self.coreDataManager = coreDataManager
-        fetchedResultsController = self.coreDataManager.fetchedResultsController()
+    init(viewModel: TaskListViewModel, navigationService: NavigationService) {
+        self.viewModel = viewModel
+        self.navigationService = navigationService
         super.init(nibName: String(describing: TaskListViewController.self), bundle: nil)
     }
     
@@ -35,7 +34,7 @@ class TaskListViewController: UIViewController {
         super.viewDidLoad()
         
         viewSetup()
-        dataFetch()
+        dataSetup()
         
     }
     
@@ -46,30 +45,19 @@ class TaskListViewController: UIViewController {
         taskTableView.register(UITableViewCell.self, forCellReuseIdentifier: "TaskCell")
     }
     
-    private func dataFetch() {
-        fetchedResultsController?.delegate = self
-        
-        do {
-            try fetchedResultsController?.performFetch()
-        } catch {
-            let fetchError = error as NSError
-            print("Unable to Save Task")
-            print("\(fetchError), \(fetchError.localizedDescription)")
-        }
+    private func dataSetup() {
+        viewModel.fetchedResultsController?.delegate = self
+        viewModel.dataFetch()
     }
     
-    
-
     // MARK: - Actions
      
      func addNewTaskAction() {
-        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: nil, mode: .add)
-        navigationController?.pushViewController(taskViewController, animated: true)
+        navigationService.pushTaskScreen(task: nil, mode: .add)
      }
-
+    
     func deleteAll() {
-        coreDataManager.deleteAllTasks()
-        coreDataManager.saveContext()
+        viewModel.deleteAllTasks()
     }
 
 }
@@ -82,19 +70,14 @@ extension TaskListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let sections = fetchedResultsController?.sections else {
-            return 0
-        }
-        
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return viewModel.numberOfObjects(section: section)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
         
-        if let task = fetchedResultsController?.object(at: indexPath) as Task? {
-            cell.textLabel?.text = task.name
+        if let taskName = viewModel.taskName(indexPath: indexPath) {
+            cell.textLabel?.text = taskName
         }
         
         return cell
@@ -110,12 +93,7 @@ extension TaskListViewController: UITableViewDataSource {
             return
         }
         
-        guard let task = fetchedResultsController?.object(at: indexPath) as Task? else {
-            return
-        }
-        
-        fetchedResultsController?.managedObjectContext.delete(task)
-        coreDataManager.saveContext()
+        viewModel.deleteTask(indexPath: indexPath)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -125,9 +103,7 @@ extension TaskListViewController: UITableViewDataSource {
 
 extension TaskListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = fetchedResultsController?.object(at: indexPath) as Task?
-        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: task, mode: .edit)
-        navigationController?.pushViewController(taskViewController, animated: true)
+        navigationService.pushTaskScreen(task: viewModel.task(indexPath: (indexPath: indexPath)), mode: .edit)
     }
 }
 

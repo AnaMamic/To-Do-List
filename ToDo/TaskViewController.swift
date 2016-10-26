@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 
+
 class TaskViewController: UIViewController {
 
     // MARK: Properties
@@ -16,27 +17,20 @@ class TaskViewController: UIViewController {
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak private var descriptionTextView: UITextView!
     
-    var task: Task?
-    let coreDataManager: CoreDataManager
-    let mode: Mode
-    enum Mode {
-        case add
-        case edit
-    }
-    
+    let viewModel: TaskViewModel
+    let navigationService: NavigationService
+   
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager, task: Task?, mode: Mode) {
-        self.coreDataManager = coreDataManager
-        self.mode = mode
-        self.task = task
+    init(viewModel: TaskViewModel, navigationService: NavigationService) {
+        self.viewModel = viewModel
+        self.navigationService = navigationService
         super.init(nibName: String(describing: TaskViewController.self), bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,46 +44,31 @@ class TaskViewController: UIViewController {
     }
     
     private func dataFetch() {
-        if let task = task {
-            nameTextField.text = task.name
-            descriptionTextView.text = task.descriptionOfTask
+        guard let (name, description) = viewModel.data() else {
+            return
         }
-
+        
+        nameTextField.text = name
+        descriptionTextView.text = description
     }
 
     func save() {
+        
+        guard let name = nameTextField.text else {
+            return
+        }
 
-        if (nameTextField.text?.isEmpty)! {
+        if name.isEmpty {
             let alert = UIAlertController(title: "", message: "Name must be filled out", preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            return
         } else {
-            switch mode {
-            case .add:
-                createTask()
-            case .edit:
-                editTask()
-            }
-        }
-        
-        navigationController?.popViewController(animated: true)
-    }
-    
-    func createTask() {
-        if let taskRecord = coreDataManager.createRecordForTask(){
-            task = taskRecord
-            task?.name = nameTextField.text!
-            task?.descriptionOfTask = descriptionTextView.text
-            task?.createdAt = NSDate().timeIntervalSinceReferenceDate
-            coreDataManager.saveContext()
+            viewModel.saveTask(name: name, description: descriptionTextView.text)
+            navigationService.popScreen()
         }
     }
     
-    func editTask() {
-        task?.name = nameTextField.text
-        task?.descriptionOfTask = descriptionTextView.text
-        coreDataManager.saveContext()
-    }
 }
 
 extension TaskViewController:  UITextFieldDelegate {
@@ -98,7 +77,6 @@ extension TaskViewController:  UITextFieldDelegate {
         return true
     }
     
-    // Hide keyboard when user tap outside
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
