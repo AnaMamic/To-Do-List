@@ -13,20 +13,18 @@ class NavigationService {
     
     // MARK: Properties
     
-    let navigationController = UINavigationController()
-    lazy var coreDataManager = CoreDataManager()
+    private let navigationController = UINavigationController()
+    private lazy var coreDataManager = CoreDataManager()
 
-    // MARK: Methods
-    
     func pushInitialScreen(window: UIWindow?) {
-        let taskListViewController = TaskListViewController(viewModel: TaskListViewModel(coreDataManager: coreDataManager), navigationService: self)
+        let taskListViewController = TaskListViewController(viewModel: TaskListViewModel(coreDataManager: coreDataManager, navigationService: self))
         navigationController.setViewControllers([taskListViewController], animated: true)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
     
     func pushTaskScreen(task: Task?, mode: TaskViewModel.Mode) {
-        let taskViewController = TaskViewController(viewModel: TaskViewModel(coreDataManager: coreDataManager, task: task, mode: mode), navigationService: self)
+        let taskViewController = TaskViewController(viewModel: TaskViewModel(coreDataManager: coreDataManager, task: task, mode: mode, navigationService: self))
         navigationController.pushViewController(taskViewController, animated: true)
     }
     

@@ -13,16 +13,14 @@ class TaskListViewController: UIViewController {
 
     // MARK: Properties
 
-    @IBOutlet weak var taskTableView: UITableView!
+    @IBOutlet weak fileprivate var taskTableView: UITableView!
     
-    let viewModel: TaskListViewModel
-    let navigationService: NavigationService
+    fileprivate let viewModel: TaskListViewModel
 
     // MARK: Initialization
     
-    init(viewModel: TaskListViewModel, navigationService: NavigationService) {
+    init(viewModel: TaskListViewModel) {
         self.viewModel = viewModel
-        self.navigationService = navigationService
         super.init(nibName: String(describing: TaskListViewController.self), bundle: nil)
     }
     
@@ -32,10 +30,8 @@ class TaskListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         viewSetup()
         dataSetup()
-        
     }
     
     private func viewSetup() {
@@ -46,20 +42,20 @@ class TaskListViewController: UIViewController {
     }
     
     private func dataSetup() {
-        viewModel.fetchedResultsController?.delegate = self
+        
+        viewModel.register(beginUpdates: { self.taskTableView.beginUpdates()}, endUpdates: {self.taskTableView.endUpdates()}, insertRows: {(indexPath, animation) in self.taskTableView.insertRows(at: indexPath, with: animation)}, deleteRows: {(indexPath, animation) in self.taskTableView.deleteRows(at: indexPath, with: animation)}, reloadRows: {(indexPath, animation) in self.taskTableView.reloadRows(at: indexPath, with: animation)})
         viewModel.dataFetch()
     }
     
     // MARK: - Actions
      
      func addNewTaskAction() {
-        navigationService.pushTaskScreen(task: nil, mode: .add)
+        viewModel.addNewTask()
      }
     
     func deleteAll() {
         viewModel.deleteAllTasks()
     }
-
 }
 
 extension TaskListViewController: UITableViewDataSource {
@@ -103,44 +99,8 @@ extension TaskListViewController: UITableViewDataSource {
 
 extension TaskListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationService.pushTaskScreen(task: viewModel.task(indexPath: (indexPath: indexPath)), mode: .edit)
+        viewModel.editTask(indexPath: indexPath)
     }
 }
 
-extension TaskListViewController: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        taskTableView.beginUpdates()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        taskTableView.endUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        switch(type) {
-        case .insert:
-            guard let newIndexPath = newIndexPath else { return }
-            taskTableView.insertRows(at: [newIndexPath], with: .fade)
-            break
-        case .delete:
-            guard let indexPath = indexPath else { return }
-            
-            taskTableView.deleteRows(at: [indexPath], with: .fade)
-            break
-        case .update:
-            guard let indexPath = indexPath else { return }
 
-            taskTableView.reloadRows(at: [indexPath], with: .fade)
-            break
-        case .move:
-            guard let indexPath = indexPath else { return  }
-            guard let newIndexPath = newIndexPath else { return }
-            
-            taskTableView.deleteRows(at: [indexPath], with: .fade)
-            taskTableView.insertRows(at: [newIndexPath], with: .fade)
-            break
-        }
-    }
-}

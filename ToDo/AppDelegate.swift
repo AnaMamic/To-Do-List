@@ -12,14 +12,12 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let navigationService = NavigationService()
+    private let navigationService = NavigationService()
     
-   
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         navigationService.pushInitialScreen(window: window)
         return true
     }
-    
 }
