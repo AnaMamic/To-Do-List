@@ -92,11 +92,11 @@ class TaskListViewModel: NSObject {
         return sectionInfo.numberOfObjects
     }
     
-    func addNewTaskTap() {
+    func addNewTask() {
         navigationService.pushTaskScreen(task: nil, mode: .add)
     }
     
-    func editTaskTap(indexPath: IndexPath) {
+    func editTask(indexPath: IndexPath) {
         navigationService.pushTaskScreen(task: task(indexPath: indexPath), mode: .edit)
     }
 }

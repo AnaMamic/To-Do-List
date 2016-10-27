@@ -50,7 +50,7 @@ class TaskListViewController: UIViewController {
     // MARK: - Actions
      
      func addNewTaskAction() {
-        viewModel.addNewTaskTap()
+        viewModel.addNewTask()
      }
     
     func deleteAll() {
@@ -99,7 +99,7 @@ extension TaskListViewController: UITableViewDataSource {
 
 extension TaskListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.editTaskTap(indexPath: indexPath)
+        viewModel.editTask(indexPath: indexPath)
     }
 }
 
