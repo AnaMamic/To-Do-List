@@ -13,17 +13,14 @@ class TaskListViewController: UIViewController {
 
     // MARK: Properties
 
-    @IBOutlet weak var taskTableView: UITableView!
+    @IBOutlet weak fileprivate var taskTableView: UITableView!
     
-    let coreDataManager: CoreDataManager
-    let fetchedResultsController: NSFetchedResultsController<Task>?
-    
-    
+    fileprivate let viewModel: TaskListViewModel
+
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager) {
-        self.coreDataManager = coreDataManager
-        fetchedResultsController = self.coreDataManager.fetchedResultsController()
+    init(viewModel: TaskListViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: String(describing: TaskListViewController.self), bundle: nil)
     }
     
@@ -33,10 +30,8 @@ class TaskListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         viewSetup()
-        dataFetch()
-        
+        dataSetup()
     }
     
     private func viewSetup() {
@@ -46,32 +41,21 @@ class TaskListViewController: UIViewController {
         taskTableView.register(UITableViewCell.self, forCellReuseIdentifier: "TaskCell")
     }
     
-    private func dataFetch() {
-        fetchedResultsController?.delegate = self
+    private func dataSetup() {
         
-        do {
-            try fetchedResultsController?.performFetch()
-        } catch {
-            let fetchError = error as NSError
-            print("Unable to Save Task")
-            print("\(fetchError), \(fetchError.localizedDescription)")
-        }
+        viewModel.register(beginUpdates: { self.taskTableView.beginUpdates()}, endUpdates: {self.taskTableView.endUpdates()}, insertRows: {(indexPath, animation) in self.taskTableView.insertRows(at: indexPath, with: animation)}, deleteRows: {(indexPath, animation) in self.taskTableView.deleteRows(at: indexPath, with: animation)}, reloadRows: {(indexPath, animation) in self.taskTableView.reloadRows(at: indexPath, with: animation)})
+        viewModel.dataFetch()
     }
     
-    
-
     // MARK: - Actions
      
      func addNewTaskAction() {
-        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: nil, mode: .add)
-        navigationController?.pushViewController(taskViewController, animated: true)
+        viewModel.addNewTask()
      }
-
+    
     func deleteAll() {
-        coreDataManager.deleteAllTasks()
-        coreDataManager.saveContext()
+        viewModel.deleteAllTasks()
     }
-
 }
 
 extension TaskListViewController: UITableViewDataSource {
@@ -82,19 +66,14 @@ extension TaskListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let sections = fetchedResultsController?.sections else {
-            return 0
-        }
-        
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        return viewModel.numberOfObjects(section: section)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
         
-        if let task = fetchedResultsController?.object(at: indexPath) as Task? {
-            cell.textLabel?.text = task.name
+        if let taskName = viewModel.taskName(indexPath: indexPath) {
+            cell.textLabel?.text = taskName
         }
         
         return cell
@@ -110,12 +89,7 @@ extension TaskListViewController: UITableViewDataSource {
             return
         }
         
-        guard let task = fetchedResultsController?.object(at: indexPath) as Task? else {
-            return
-        }
-        
-        fetchedResultsController?.managedObjectContext.delete(task)
-        coreDataManager.saveContext()
+        viewModel.deleteTask(indexPath: indexPath)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
@@ -125,46 +99,8 @@ extension TaskListViewController: UITableViewDataSource {
 
 extension TaskListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = fetchedResultsController?.object(at: indexPath) as Task?
-        let taskViewController = TaskViewController(coreDataManager: coreDataManager, task: task, mode: .edit)
-        navigationController?.pushViewController(taskViewController, animated: true)
+        viewModel.editTask(indexPath: indexPath)
     }
 }
 
-extension TaskListViewController: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        taskTableView.beginUpdates()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        taskTableView.endUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        switch(type) {
-        case .insert:
-            guard let newIndexPath = newIndexPath else { return }
-            taskTableView.insertRows(at: [newIndexPath], with: .fade)
-            break
-        case .delete:
-            guard let indexPath = indexPath else { return }
-            
-            taskTableView.deleteRows(at: [indexPath], with: .fade)
-            break
-        case .update:
-            guard let indexPath = indexPath else { return }
 
-            taskTableView.reloadRows(at: [indexPath], with: .fade)
-            break
-        case .move:
-            guard let indexPath = indexPath else { return  }
-            guard let newIndexPath = newIndexPath else { return }
-            
-            taskTableView.deleteRows(at: [indexPath], with: .fade)
-            taskTableView.insertRows(at: [newIndexPath], with: .fade)
-            break
-        }
-    }
-}

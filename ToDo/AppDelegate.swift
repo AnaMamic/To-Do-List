@@ -7,25 +7,17 @@
 //
 
 import UIKit
-import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    lazy var coreDataManager = CoreDataManager()
+    private let navigationService = NavigationService()
     
-   
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        
-        let taskListViewController = TaskListViewController(coreDataManager: coreDataManager)
-        let navigationController = UINavigationController(rootViewController: taskListViewController)
-       
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
+        navigationService.pushInitialScreen(window: window)
         return true
     }
-    
 }
