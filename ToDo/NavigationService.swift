@@ -16,6 +16,7 @@ class NavigationService {
     let navigationController = UINavigationController()
     lazy var coreDataManager = CoreDataManager()
 
+    // MARK: Methods
     
     func pushInitialScreen(window: UIWindow?) {
         let taskListViewController = TaskListViewController(viewModel: TaskListViewModel(coreDataManager: coreDataManager), navigationService: self)
@@ -33,8 +34,19 @@ class NavigationService {
         navigationController.popViewController(animated: true)
     }
     
+    func pushTaskImagesScreen() {
+        let taskImagesViewController = TaskImagesViewController(navigationService: self)
+        navigationController.pushViewController(taskImagesViewController, animated: true)
+    }
     
+    func pushImagePickerController(taskImagesViewController: TaskImagesViewController) {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = taskImagesViewController
+        taskImagesViewController.present(imagePickerController, animated: true, completion: nil)
+    }
     
-    
+    func dismissImagePickerController(taskImagesViewController: TaskImagesViewController) {
+        taskImagesViewController.dismiss(animated: true, completion: nil)
+    }
     
 }

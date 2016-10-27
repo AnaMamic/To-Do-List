@@ -69,6 +69,10 @@ class TaskViewController: UIViewController {
         }
     }
     
+    @IBAction func imagesButton(_ sender: UIButton) {
+        navigationService.pushTaskImagesScreen()
+    }
+    
 }
 
 extension TaskViewController:  UITextFieldDelegate {
