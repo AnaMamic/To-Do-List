@@ -13,9 +13,10 @@ class TaskViewModel {
     
     // MARK: Properties
     
-    var task: Task?
-    let coreDataManager: CoreDataManager
-    let mode: Mode
+    private var task: Task?
+    private let coreDataManager: CoreDataManager
+    private let navigationService: NavigationService
+    private let mode: Mode
     enum Mode {
         case add
         case edit
@@ -23,10 +24,11 @@ class TaskViewModel {
     
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager, task: Task?, mode: Mode) {
+    init(coreDataManager: CoreDataManager, task: Task?, mode: Mode, navigationService: NavigationService) {
         self.coreDataManager = coreDataManager
         self.task = task
         self.mode = mode
+        self.navigationService = navigationService
     }
     
     // MARK: Methods
@@ -40,6 +42,7 @@ class TaskViewModel {
         task?.name = name
         task?.descriptionOfTask = description
         coreDataManager.saveContext()
+        navigationService.popScreen()
     }
     
     func data() -> (String, String)? {

@@ -14,17 +14,15 @@ class TaskViewController: UIViewController {
 
     // MARK: Properties
     
-    @IBOutlet weak var nameTextField: UITextField!
+    @IBOutlet weak fileprivate var nameTextField: UITextField!
     @IBOutlet weak private var descriptionTextView: UITextView!
     
-    let viewModel: TaskViewModel
-    let navigationService: NavigationService
+    private let viewModel: TaskViewModel
    
     // MARK: Initialization
     
-    init(viewModel: TaskViewModel, navigationService: NavigationService) {
+    init(viewModel: TaskViewModel) {
         self.viewModel = viewModel
-        self.navigationService = navigationService
         super.init(nibName: String(describing: TaskViewController.self), bundle: nil)
     }
     
@@ -65,10 +63,8 @@ class TaskViewController: UIViewController {
             return
         } else {
             viewModel.saveTask(name: name, description: descriptionTextView.text)
-            navigationService.popScreen()
         }
     }
-    
 }
 
 extension TaskViewController:  UITextFieldDelegate {
@@ -80,7 +76,6 @@ extension TaskViewController:  UITextFieldDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
-
 }
 
 
