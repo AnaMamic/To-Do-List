@@ -14,13 +14,12 @@ class TaskImagesViewController: UIViewController {
     
     @IBOutlet weak var taskCollectionView: UICollectionView!
     
-    let navigationService: NavigationService
-    var images = [UIImage]()
+    fileprivate let viewModel: TaskImagesViewModel
     
     // MARK: Initialization
     
-    init(navigationService: NavigationService) {
-        self.navigationService = navigationService
+    init(viewModel: TaskImagesViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: String(describing: TaskImagesViewController.self), bundle: nil)
     }
     
@@ -30,21 +29,27 @@ class TaskImagesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         viewSetup()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if viewModel.imageDeleted() {
+            guard let indexPath = viewModel.indexPathOfDeletedImage() else {
+                return
+            }
+            taskCollectionView.deleteItems(at: [indexPath])
+        }
     }
     
     func viewSetup() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "+", style: .plain, target: self, action: #selector(addNewImage))
-        //taskCollectionView.register(ImageCollectionViewCell.self, forCellWithReuseIdentifier: "TaskImageCell")
         taskCollectionView.contentInset = UIEdgeInsetsMake(5, 5, 5, 5)
+        
         taskCollectionView.register(UINib(nibName: "TaskImageCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "TaskImageCell")
-        taskCollectionView.register(TaskImageCollectionViewCell.self, forCellWithReuseIdentifier: "TaskImageCell")
-           }
-
+    }
     
     func addNewImage() {
-        navigationService.pushImagePickerController(taskImagesViewController: self)
+        viewModel.presentImagePickerController(taskImagesViewController: self)
     }
 }
 
@@ -55,20 +60,13 @@ extension TaskImagesViewController: UICollectionViewDataSource {
     }
    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count
+        return viewModel.numberOfImages()
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TaskImageCell", for: indexPath) as! TaskImageCollectionViewCell
         
-        
-        print("Naslo sliku")
-        
-        let slika = images[indexPath.row]
-        print(slika)
-        cell.imageView = UIImageView()
-        cell.imageView = slika
-        cell.backgroundColor = UIColor.black
+        cell.imageView.image = viewModel.image(indexPath: indexPath)
         return cell
     }
     
@@ -78,19 +76,18 @@ extension TaskImagesViewController: UICollectionViewDataSource {
         let size = (UIScreen.main.bounds.width - 30) / 3
         return CGSize(width: size, height: size)
     }
+    
 }
 
 extension TaskImagesViewController: UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.showImage(at: indexPath)
+    }
 }
 
 extension TaskImagesViewController: UIImagePickerControllerDelegate {
-    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
-        images.append(selectedImage)
-        print(images.count)
-        navigationService.dismissImagePickerController(taskImagesViewController: self)
+        viewModel.dismissImagePickerController(taskImagesViewController: self, selectedImage: info[UIImagePickerControllerOriginalImage] as! UIImage)
         taskCollectionView.reloadData()
     }
 }

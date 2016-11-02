@@ -16,6 +16,7 @@ class TaskViewModel {
     private var task: Task?
     private let coreDataManager: CoreDataManager
     private let navigationService: NavigationService
+    private let imageService = ImageService()
     private let mode: Mode
     enum Mode {
         case add
@@ -29,6 +30,15 @@ class TaskViewModel {
         self.task = task
         self.mode = mode
         self.navigationService = navigationService
+
+        TaskImagesSingleton.sharedInstance.newTaskImagesData = [Data]()
+        TaskImagesSingleton.sharedInstance.deletedTaskImages = Set<Image>()
+        
+        guard let taskImages = task?.images as? Set<Image> else {
+            return
+        }
+        print(taskImages.count)
+        TaskImagesSingleton.sharedInstance.taskImages = Array(taskImages)
     }
     
     // MARK: Methods
@@ -41,15 +51,33 @@ class TaskViewModel {
         
         task?.name = name
         task?.descriptionOfTask = description
+        saveTaskImages()
+         task?.removeFromImages(NSSet(set: TaskImagesSingleton.sharedInstance.deletedTaskImages))
         coreDataManager.saveContext()
         navigationService.popScreen()
+    }
+    
+    private func saveTaskImages() {
+        for imageData in TaskImagesSingleton.sharedInstance.newTaskImagesData {
+            if let image = coreDataManager.createRecordForImage() {
+                let imageName = String(NSDate().timeIntervalSince1970)
+                image.name = imageName
+                imageService.saveImageToDocumentsDirectory(name: imageName, imageData: imageData)
+                task?.addToImages(image)
+            }
+
+        }
     }
     
     func data() -> (String, String)? {
         guard let task = task else {
             return nil
         }
-        
         return(task.name ?? "", task.descriptionOfTask ?? "")
     }
+    
+    func presentImages() {
+        navigationService.pushTaskImagesScreen()
+    }
+    
 }

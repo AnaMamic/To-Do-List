@@ -33,7 +33,7 @@ class NavigationService {
     }
     
     func pushTaskImagesScreen() {
-        let taskImagesViewController = TaskImagesViewController(navigationService: self)
+        let taskImagesViewController = TaskImagesViewController(viewModel: TaskImagesViewModel(coreDataManager: coreDataManager, navigationService: self))
         navigationController.pushViewController(taskImagesViewController, animated: true)
     }
     
@@ -47,4 +47,13 @@ class NavigationService {
         taskImagesViewController.dismiss(animated: true, completion: nil)
     }
     
+    func pushImageScreen(indexPath: IndexPath, selectedImage: UIImage) {
+        let deleteImageViewController = DeleteImageViewController(viewModel: DeleteImageViewModel(navigationService: self, selectedImage: selectedImage, indexPath: indexPath))
+        navigationController.pushViewController(deleteImageViewController, animated: true)
+    }
+    
+    func popImageScreen() {
+        navigationController.popViewController(animated: true)
+    }
+
 }

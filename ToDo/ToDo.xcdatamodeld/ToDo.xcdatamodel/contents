@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11232" systemVersion="15F34" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Image" representedClassName=".Image" syncable="YES">
+        <attribute name="name" attributeType="String" syncable="YES"/>
+        <relationship name="task" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Task" inverseName="images" inverseEntity="Task" syncable="YES"/>
+    </entity>
     <entity name="Task" representedClassName=".Task" syncable="YES">
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="descriptionOfTask" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
+        <relationship name="images" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Image" inverseName="task" inverseEntity="Image" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Task" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="Image" positionX="-126" positionY="123" width="128" height="73"/>
+        <element name="Task" positionX="-63" positionY="-18" width="128" height="103"/>
     </elements>
 </model>
