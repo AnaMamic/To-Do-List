@@ -30,7 +30,6 @@
 		ADDA44901DC1114800520184 /* TaskImageCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADDA448E1DC1114800520184 /* TaskImageCollectionViewCell.xib */; };
 		ADDE92A51DB8BC6500C9F15C /* ToDo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADDE92A31DB8BC6500C9F15C /* ToDo.xcdatamodeld */; };
 		ADDE92A71DB8CB3600C9F15C /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDE92A61DB8CB3600C9F15C /* CoreDataManager.swift */; };
-		ADE2591E1DC343FB007A3090 /* TaskImagesSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE2591D1DC343FB007A3090 /* TaskImagesSingleton.swift */; };
 		ADE259211DC3506E007A3090 /* DeleteImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE2591F1DC3506E007A3090 /* DeleteImageViewController.swift */; };
 		ADE259221DC3506E007A3090 /* DeleteImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADE259201DC3506E007A3090 /* DeleteImageViewController.xib */; };
 		ADE259241DC351F1007A3090 /* DeleteImageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE259231DC351F1007A3090 /* DeleteImageViewModel.swift */; };
@@ -77,7 +76,6 @@
 		ADDA448E1DC1114800520184 /* TaskImageCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TaskImageCollectionViewCell.xib; sourceTree = "<group>"; };
 		ADDE92A41DB8BC6500C9F15C /* ToDo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ToDo.xcdatamodel; sourceTree = "<group>"; };
 		ADDE92A61DB8CB3600C9F15C /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		ADE2591D1DC343FB007A3090 /* TaskImagesSingleton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskImagesSingleton.swift; sourceTree = "<group>"; };
 		ADE2591F1DC3506E007A3090 /* DeleteImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteImageViewController.swift; sourceTree = "<group>"; };
 		ADE259201DC3506E007A3090 /* DeleteImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DeleteImageViewController.xib; sourceTree = "<group>"; };
 		ADE259231DC351F1007A3090 /* DeleteImageViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteImageViewModel.swift; sourceTree = "<group>"; };
@@ -126,7 +124,6 @@
 			isa = PBXGroup;
 			children = (
 				AD59A9D21DB61B4D0006D256 /* AppDelegate.swift */,
-				ADE2591D1DC343FB007A3090 /* TaskImagesSingleton.swift */,
 				ADF1C9511DBFA57C0041ECDF /* NavigationService.swift */,
 				ADDE92A61DB8CB3600C9F15C /* CoreDataManager.swift */,
 				AD82FF151DBE235400916A71 /* CoreDataManager+Task.swift */,
@@ -138,18 +135,18 @@
 				ADDA448D1DC1114800520184 /* TaskImageCollectionViewCell.swift */,
 				ADDA448E1DC1114800520184 /* TaskImageCollectionViewCell.xib */,
 				AD458A881DC247D600E8F3FF /* ImageService.swift */,
-				ADDA44851DC0D09900520184 /* TaskImagesViewController.swift */,
-				ADDA44891DC0D0E000520184 /* TaskImagesViewModel.swift */,
-				ADDA44861DC0D09900520184 /* TaskImagesViewController.xib */,
 				AD82FF131DBE231900916A71 /* TaskListViewController.swift */,
 				ADF1C94F1DBF98AB0041ECDF /* TaskListViewModel.swift */,
 				AD82FF1A1DBE235400916A71 /* TaskListViewController.xib */,
-				ADE2591F1DC3506E007A3090 /* DeleteImageViewController.swift */,
-				ADE259231DC351F1007A3090 /* DeleteImageViewModel.swift */,
-				ADE259201DC3506E007A3090 /* DeleteImageViewController.xib */,
 				AD82FF1B1DBE235400916A71 /* TaskViewController.swift */,
 				ADF1C94D1DBF7BE10041ECDF /* TaskViewModel.swift */,
 				AD82FF1C1DBE235400916A71 /* TaskViewController.xib */,
+				ADDA44851DC0D09900520184 /* TaskImagesViewController.swift */,
+				ADDA44891DC0D0E000520184 /* TaskImagesViewModel.swift */,
+				ADDA44861DC0D09900520184 /* TaskImagesViewController.xib */,
+				ADE2591F1DC3506E007A3090 /* DeleteImageViewController.swift */,
+				ADE259231DC351F1007A3090 /* DeleteImageViewModel.swift */,
+				ADE259201DC3506E007A3090 /* DeleteImageViewController.xib */,
 				ADDE92A31DB8BC6500C9F15C /* ToDo.xcdatamodeld */,
 				AD59A9D61DB61B4D0006D256 /* Main.storyboard */,
 				AD59A9D91DB61B4D0006D256 /* Assets.xcassets */,
@@ -276,7 +273,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADE2591E1DC343FB007A3090 /* TaskImagesSingleton.swift in Sources */,
 				ADDE92A71DB8CB3600C9F15C /* CoreDataManager.swift in Sources */,
 				ADDA44871DC0D09900520184 /* TaskImagesViewController.swift in Sources */,
 				ADE259211DC3506E007A3090 /* DeleteImageViewController.swift in Sources */,

@@ -21,7 +21,7 @@ class DeleteImageViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("#function has not been implemented")
     }
     
     override func viewDidLoad() {

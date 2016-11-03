@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskImagesViewController: UIViewController {
+class TaskImagesViewController: UIViewController, UINavigationControllerDelegate {
     
     // MARK: Properties
     
@@ -24,32 +24,33 @@ class TaskImagesViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("#function has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         viewSetup()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        if viewModel.imageDeleted() {
-            guard let indexPath = viewModel.indexPathOfDeletedImage() else {
-                return
-            }
-            taskCollectionView.deleteItems(at: [indexPath])
-        }
-    }
-    
+
     func viewSetup() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "+", style: .plain, target: self, action: #selector(addNewImage))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Back", style: .bordered, target: self, action: #selector(backTapped))
         taskCollectionView.contentInset = UIEdgeInsetsMake(5, 5, 5, 5)
-        
         taskCollectionView.register(UINib(nibName: "TaskImageCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "TaskImageCell")
     }
-    
+    func backTapped() {
+        viewModel.popTaskImagesViewController()
+    }
     func addNewImage() {
         viewModel.presentImagePickerController(taskImagesViewController: self)
+    }
+    
+    func deleteImageFromView() {
+        guard let indexOfDeletedImage = viewModel.deleteImage() else {
+            return
+        }
+        
+        taskCollectionView.deleteItems(at: [indexOfDeletedImage])
     }
 }
 
@@ -91,13 +92,3 @@ extension TaskImagesViewController: UIImagePickerControllerDelegate {
         taskCollectionView.reloadData()
     }
 }
-
-extension TaskImagesViewController: UINavigationControllerDelegate {
-    
-}
-
-
-
-
-
-

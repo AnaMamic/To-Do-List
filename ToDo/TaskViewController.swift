@@ -27,7 +27,7 @@ class TaskViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("#function has not been implemented")
     }
 
     override func viewDidLoad() {
@@ -66,6 +66,10 @@ class TaskViewController: UIViewController {
         }
     }
     
+    func setupViewModel(newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
+        viewModel.setup(newTaskImagesData: newTaskImagesData, deletedTaskImages: deletedTaskImages)
+    }
+    
     @IBAction func imagesButton(_ sender: UIButton) {
         viewModel.presentImages()
     }
@@ -82,7 +86,3 @@ extension TaskViewController:  UITextFieldDelegate {
         self.view.endEditing(true)
     }
 }
-
-
-
-

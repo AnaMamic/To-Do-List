@@ -18,26 +18,33 @@ class TaskImagesViewModel {
     private let coreDataManager: CoreDataManager
     private let navigationService: NavigationService
     private var images = [UIImage]()
+    private var taskImages: [Image]
+    private var newTaskImagesData: [Data]
+    private var deletedTaskImages: Set<Image>
+    private var selectedIndexPath: IndexPath?
     
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager, navigationService: NavigationService) {
+    init(coreDataManager: CoreDataManager, navigationService: NavigationService, taskImages: [Image], newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
         self.coreDataManager = coreDataManager
         self.navigationService = navigationService
+        self.taskImages = taskImages
+        self.newTaskImagesData = newTaskImagesData
+        self.deletedTaskImages = deletedTaskImages
         setImages()
     }
     
     // MARK: Methods
     
     private func setImages() {
-        for taskImage in TaskImagesSingleton.sharedInstance.taskImages {
+        for taskImage in taskImages {
             guard let image = imageService.getImageFromDocumetsDirectory(name: taskImage.name ?? "")  else {
                 return
             }
             images.append(image)
         }
         
-        for imageData in TaskImagesSingleton.sharedInstance.newTaskImagesData {
+        for imageData in newTaskImagesData {
             guard let image = UIImage(data: imageData)  else {
                 return
             }
@@ -62,7 +69,7 @@ class TaskImagesViewModel {
         }
         
         images.append(selectedImage)
-        TaskImagesSingleton.sharedInstance.newTaskImagesData.append(selectedImageData)
+        newTaskImagesData.append(selectedImageData)
     }
     
     func numberOfImages() -> Int {
@@ -70,25 +77,30 @@ class TaskImagesViewModel {
     }
     
     func showImage(at: IndexPath) {
+        selectedIndexPath = at
         navigationService.pushImageScreen(indexPath: at, selectedImage: images[at.row])
     }
     
-    func imageDeleted() -> Bool {
-        if TaskImagesSingleton.sharedInstance.imageDeleted {
-            TaskImagesSingleton.sharedInstance.imageDeleted = false
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    func indexPathOfDeletedImage() -> IndexPath? {
-        guard let indexPath = TaskImagesSingleton.sharedInstance.indexOfDeletedImage else {
+    func deleteImage() -> IndexPath? {
+        guard let indexPath = selectedIndexPath else {
             return nil
         }
         
+        if indexPath.row < taskImages.count {
+            let deletedImage = taskImages.remove(at: indexPath.row)
+            deletedTaskImages.insert(deletedImage)
+            
+        } else {
+            newTaskImagesData.remove(at: indexPath.row - taskImages.count)
+        }
+        
         images.remove(at: indexPath.row)
+        
         return indexPath
     }
+    
+    func popTaskImagesViewController() {
+        navigationService.popTaskImagesScreen(newTaskImagesData: newTaskImagesData
+        , deletedTaskImages: deletedTaskImages)
+    }
 }
-
