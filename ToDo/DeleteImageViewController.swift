@@ -21,7 +21,7 @@ class DeleteImageViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("#function has not been implemented")
+        fatalError("\(#function) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -29,10 +29,10 @@ class DeleteImageViewController: UIViewController {
         
         imageView.image = viewModel.selectedImage
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete", style: .plain, target: self, action: #selector(deleteImageTap))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete", style: .plain, target: self, action: #selector(deleteImageTapped))
     }
     
-    func deleteImageTap() {
+    func deleteImageTapped() {
         viewModel.deleteImage()
     }
 }

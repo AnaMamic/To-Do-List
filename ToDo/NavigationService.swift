@@ -28,22 +28,9 @@ class NavigationService {
         navigationController.pushViewController(taskViewController, animated: true)
     }
     
-    func popScreen() {
-        navigationController.popViewController(animated: true)
-    }
-    
-    func pushTaskImagesScreen(taskImages: [Image], newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
-        let taskImagesViewController = TaskImagesViewController(viewModel: TaskImagesViewModel(coreDataManager: coreDataManager, navigationService: self, taskImages: taskImages, newTaskImagesData: newTaskImagesData, deletedTaskImages: deletedTaskImages))
+    func pushTaskImagesScreen(taskImages: [Image], newTaskImages: [UIImage], addTaskImages: @escaping AddTaskImages, deleteTaskImage: @escaping DeleteTaskImage) {
+        let taskImagesViewController = TaskImagesViewController(viewModel: TaskImagesViewModel(coreDataManager: coreDataManager, navigationService: self, taskImages: taskImages, newTaskImages: newTaskImages, addTaskImages: addTaskImages, deleteTaskImage: deleteTaskImage))
         navigationController.pushViewController(taskImagesViewController, animated: true)
-    }
-    
-    func popTaskImagesScreen(newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
-        guard let taskViewController = navigationController.viewControllers[navigationController.viewControllers.count - 2] as? TaskViewController else {
-            return
-        }
-        
-        taskViewController.setupViewModel(newTaskImagesData: newTaskImagesData, deletedTaskImages: deletedTaskImages)
-        navigationController.popViewController(animated: true)
     }
     
     func pushImagePickerController(taskImagesViewController: TaskImagesViewController) {
@@ -52,26 +39,16 @@ class NavigationService {
         taskImagesViewController.present(imagePickerController, animated: true, completion: nil)
     }
     
-    func dismissImagePickerController(taskImagesViewController: TaskImagesViewController) {
-        taskImagesViewController.dismiss(animated: true, completion: nil)
-    }
-    
-    func pushImageScreen(indexPath: IndexPath, selectedImage: UIImage) {
-        let deleteImageViewController = DeleteImageViewController(viewModel: DeleteImageViewModel(navigationService: self, selectedImage: selectedImage))
+    func pushImageScreen(indexPath: IndexPath, selectedImage: UIImage, closure: @escaping VoidClosure) {
+        let deleteImageViewController = DeleteImageViewController(viewModel: DeleteImageViewModel(navigationService: self, selectedImage: selectedImage, closure: closure))
         navigationController.pushViewController(deleteImageViewController, animated: true)
     }
-    
-    func popImageScreen() {
-        navigationController.popViewController(animated: true)
-    }
-    
-    func popDeleteImageScreen() {
-        guard let taskImagesViewController = navigationController.viewControllers[navigationController.viewControllers.count - 2] as? TaskImagesViewController else {
-            return
-        }
-        
-        taskImagesViewController.deleteImageFromView()
+
+    func popScreen() {
         navigationController.popViewController(animated: true)
     }
 
+    func dismissImagePickerController(taskImagesViewController: TaskImagesViewController) {
+        taskImagesViewController.dismiss(animated: true, completion: nil)
+    }
 }

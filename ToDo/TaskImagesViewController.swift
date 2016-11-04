@@ -24,12 +24,16 @@ class TaskImagesViewController: UIViewController, UINavigationControllerDelegate
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("#function has not been implemented")
+        fatalError("\(#function) has not been implemented")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         viewSetup()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        taskCollectionView.reloadData()
     }
 
     func viewSetup() {
@@ -43,14 +47,6 @@ class TaskImagesViewController: UIViewController, UINavigationControllerDelegate
     }
     func addNewImage() {
         viewModel.presentImagePickerController(taskImagesViewController: self)
-    }
-    
-    func deleteImageFromView() {
-        guard let indexOfDeletedImage = viewModel.deleteImage() else {
-            return
-        }
-        
-        taskCollectionView.deleteItems(at: [indexOfDeletedImage])
     }
 }
 

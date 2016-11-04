@@ -14,13 +14,16 @@ class DeleteImageViewModel {
     // MARK: Properties
     private let navigationService: NavigationService
     let selectedImage: UIImage
+    private let closure: VoidClosure
     
-    init(navigationService: NavigationService, selectedImage: UIImage) {
+    init(navigationService: NavigationService, selectedImage: UIImage, closure: @escaping VoidClosure) {
         self.navigationService = navigationService
         self.selectedImage = selectedImage
+        self.closure = closure
     }
     
     func deleteImage() {
-        navigationService.popDeleteImageScreen()
+        closure()
+        navigationService.popScreen()
     }
 }

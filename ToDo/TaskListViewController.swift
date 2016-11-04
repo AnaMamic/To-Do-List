@@ -25,7 +25,7 @@ class TaskListViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("#function has not been implemented")
+        fatalError("\(#function) has not been implemented")
     }
     
     override func viewDidLoad() {

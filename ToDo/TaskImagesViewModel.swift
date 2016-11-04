@@ -10,6 +10,9 @@ import Foundation
 import CoreData
 import UIKit
 
+typealias AddTaskImages = (UIImage) -> ()
+typealias DeleteTaskImage = (Int) -> ()
+
 class TaskImagesViewModel {
     
     // MARK: Properties
@@ -17,41 +20,41 @@ class TaskImagesViewModel {
     private let imageService = ImageService()
     private let coreDataManager: CoreDataManager
     private let navigationService: NavigationService
-    private var images = [UIImage]()
     private var taskImages: [Image]
-    private var newTaskImagesData: [Data]
-    private var deletedTaskImages: Set<Image>
-    private var selectedIndexPath: IndexPath?
+    private var newTaskImages: [UIImage]
+    private var images = [UIImage]()
+    private let addTaskImages: AddTaskImages
+    private let deleteTaskImage: DeleteTaskImage
     
     // MARK: Initialization
     
-    init(coreDataManager: CoreDataManager, navigationService: NavigationService, taskImages: [Image], newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
+    init(coreDataManager: CoreDataManager, navigationService: NavigationService, taskImages: [Image], newTaskImages: [UIImage], addTaskImages: @escaping AddTaskImages, deleteTaskImage: @escaping DeleteTaskImage) {
         self.coreDataManager = coreDataManager
         self.navigationService = navigationService
         self.taskImages = taskImages
-        self.newTaskImagesData = newTaskImagesData
-        self.deletedTaskImages = deletedTaskImages
+        self.newTaskImages = newTaskImages
+        self.addTaskImages = addTaskImages
+        self.deleteTaskImage = deleteTaskImage
+        
         setImages()
     }
     
     // MARK: Methods
-    
+
     private func setImages() {
         for taskImage in taskImages {
-            guard let image = imageService.getImageFromDocumetsDirectory(name: taskImage.name ?? "")  else {
-                return
-            }
+            guard let image = imageService.getImageFromDocumetsDirectory(name: taskImage.name ?? "") else {
+                    return
+                }
+                
             images.append(image)
         }
         
-        for imageData in newTaskImagesData {
-            guard let image = UIImage(data: imageData)  else {
-                return
-            }
-            images.append(image)
-        }
+        images += newTaskImages
+        
+        print(images.count)
     }
-
+    
     func image(indexPath: IndexPath) -> UIImage {
         return images[indexPath.row]
     }
@@ -64,12 +67,8 @@ class TaskImagesViewModel {
         
         navigationService.dismissImagePickerController(taskImagesViewController: taskImagesViewController)
         
-        guard let selectedImageData = UIImagePNGRepresentation(selectedImage) else {
-            return
-        }
-        
+        addTaskImages(selectedImage)
         images.append(selectedImage)
-        newTaskImagesData.append(selectedImageData)
     }
     
     func numberOfImages() -> Int {
@@ -77,30 +76,15 @@ class TaskImagesViewModel {
     }
     
     func showImage(at: IndexPath) {
-        selectedIndexPath = at
-        navigationService.pushImageScreen(indexPath: at, selectedImage: images[at.row])
+        navigationService.pushImageScreen(indexPath: at, selectedImage: images[at.row], closure: { [weak self] in self?.deleteImageAt(indexPath: at)})
     }
-    
-    func deleteImage() -> IndexPath? {
-        guard let indexPath = selectedIndexPath else {
-            return nil
-        }
-        
-        if indexPath.row < taskImages.count {
-            let deletedImage = taskImages.remove(at: indexPath.row)
-            deletedTaskImages.insert(deletedImage)
-            
-        } else {
-            newTaskImagesData.remove(at: indexPath.row - taskImages.count)
-        }
-        
+
+    func deleteImageAt(indexPath: IndexPath) {
+        deleteTaskImage(indexPath.row)
         images.remove(at: indexPath.row)
-        
-        return indexPath
     }
     
     func popTaskImagesViewController() {
-        navigationService.popTaskImagesScreen(newTaskImagesData: newTaskImagesData
-        , deletedTaskImages: deletedTaskImages)
+        navigationService.popScreen()
     }
 }

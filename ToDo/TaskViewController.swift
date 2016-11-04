@@ -27,7 +27,7 @@ class TaskViewController: UIViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("#function has not been implemented")
+        fatalError("\(#function) has not been implemented")
     }
 
     override func viewDidLoad() {
@@ -64,10 +64,6 @@ class TaskViewController: UIViewController {
         } else {
             viewModel.saveTask(name: name, description: descriptionTextView.text)
         }
-    }
-    
-    func setupViewModel(newTaskImagesData: [Data], deletedTaskImages: Set<Image>) {
-        viewModel.setup(newTaskImagesData: newTaskImagesData, deletedTaskImages: deletedTaskImages)
     }
     
     @IBAction func imagesButton(_ sender: UIButton) {
