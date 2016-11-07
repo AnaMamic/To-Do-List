@@ -87,4 +87,8 @@ extension TaskImagesViewController: UIImagePickerControllerDelegate {
         viewModel.dismissImagePickerController(taskImagesViewController: self, selectedImage: info[UIImagePickerControllerOriginalImage] as! UIImage)
         taskCollectionView.reloadData()
     }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        viewModel.dismissImagePickerController(taskImagesViewController: self, selectedImage: nil)
+    }
 }

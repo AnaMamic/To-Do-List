@@ -63,14 +63,18 @@ class TaskImagesViewModel {
         navigationService.pushImagePickerController(taskImagesViewController: taskImagesViewController)
     }
     
-    func dismissImagePickerController(taskImagesViewController: TaskImagesViewController, selectedImage: UIImage) {
+    func dismissImagePickerController(taskImagesViewController: TaskImagesViewController, selectedImage: UIImage?) {
         
         navigationService.dismissImagePickerController(taskImagesViewController: taskImagesViewController)
+        
+        guard let selectedImage = selectedImage else {
+            return
+        }
         
         addTaskImages(selectedImage)
         images.append(selectedImage)
     }
-    
+
     func numberOfImages() -> Int {
         return images.count
     }
