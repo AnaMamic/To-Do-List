@@ -42,4 +42,3 @@ extension CoreDataManager {
         return fetchedResultsController as? TaskFetchedResultsController
     }
 }
-

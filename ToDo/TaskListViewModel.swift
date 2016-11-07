@@ -133,5 +133,4 @@ extension TaskListViewModel: NSFetchedResultsControllerDelegate {
             break
         }
     }
-    
 }

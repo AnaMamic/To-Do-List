@@ -17,9 +17,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="sa4-4D-pdz">
-                    <frame key="frameInset" width="375" height="667"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="sa4-4D-pdz">
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="hra-JK-KbJ"/>
@@ -28,7 +26,13 @@
                 </tableView>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-            <point key="canvasLocation" x="34.5" y="144.5"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="sa4-4D-pdz" secondAttribute="bottom" id="AEk-5u-mpi"/>
+                <constraint firstAttribute="trailing" secondItem="sa4-4D-pdz" secondAttribute="trailing" id="ASy-m6-U3E"/>
+                <constraint firstItem="sa4-4D-pdz" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="EnE-ZF-cQX"/>
+                <constraint firstItem="sa4-4D-pdz" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Ri8-r9-rxl"/>
+            </constraints>
+            <point key="canvasLocation" x="34" y="144"/>
         </view>
     </objects>
 </document>
